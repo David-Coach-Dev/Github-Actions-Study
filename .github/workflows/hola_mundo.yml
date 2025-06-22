@@ -29,6 +29,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: hola-mundo
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4.1.7
       - name: List all files
         run: |
           echo "Listing all files in the repository:"
