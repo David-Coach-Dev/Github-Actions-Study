@@ -6,3 +6,17 @@ jobs:
     steps:
       - name: Hola Mundo
         run: echo "Hola Mundo"
+
+  list-all-files:
+    runs-on: ubuntu-latest
+    steps:
+      - name: List all files
+        run: |
+          echo "Listing all files in the repository:"
+          ls -la
+          echo "Current directory:"
+          pwd
+          echo "Files in the current directory:"
+          ls -la .
+          echo "Files in the parent directory:"
+          ls -la ..
