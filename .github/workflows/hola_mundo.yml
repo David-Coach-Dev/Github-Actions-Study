@@ -1,7 +1,7 @@
 name: Hola Mundo
 on: [push]
 jobs:
-  build:
+  hola-mundo:
     runs-on: ubuntu-latest
     steps:
       - name: Hola Mundo
