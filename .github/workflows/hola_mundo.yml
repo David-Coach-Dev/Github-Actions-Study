@@ -7,6 +7,24 @@ jobs:
       - name: Hola Mundo
         run: echo "Hola Mundo"
 
+      - name: touch file
+        run: |
+          echo "Creating a file named hola.txt"
+          touch hola.txt
+          echo "File created successfully."
+
+      - name: set text in file
+        run: |
+          echo "Setting text in hola.txt"
+          echo "Hola Mundo desde GitHub Actions" > hola.txt
+          echo "Text set successfully."
+
+      - name: show file content
+        run: |
+          echo "Showing content of hola.txt"
+          cat hola.txt
+          echo "Content displayed successfully."
+
   list-all-files:
     runs-on: ubuntu-latest
     steps:
