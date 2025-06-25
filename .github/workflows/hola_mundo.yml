@@ -4,6 +4,8 @@ jobs:
   hola-mundo:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4.1.7
       - name: saludo
         uses: ././.github/actions/dc_dev_actions
   list-all-files:
