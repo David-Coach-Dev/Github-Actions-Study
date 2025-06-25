@@ -1,6 +1,12 @@
 name: "Dc Dev Actions"
 description: "A collection the DC Dev actions"
 
+inputs:
+  message:
+    description: "Message to display"
+    required: false
+    default: "from Dc Dev Actions"
+
 runs:
   using: "composite"
 
@@ -9,7 +15,7 @@ runs:
       id: "Hola"
       uses: "actions/hello-world-javascript-action@v1"
       with:
-        who-to-greet: "de parte de Dc Dev."
+        who-to-greet: "${{ inputs.message }}"
     - name: "Print greeting"
       shell: bash
       run: |
