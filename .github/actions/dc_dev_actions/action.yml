@@ -7,6 +7,6 @@ runs:
   steps:
     - name: "Hello World"
       id: "Hola"
-      uses: "actions/hello-world@v1"
+      uses: "actions/hello-world-javascript-action@v1"
       with:
         who-to-greet: "de parte de Dc Dev."
