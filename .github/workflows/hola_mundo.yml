@@ -32,7 +32,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4.1.7
 
+      - name: js-action-cf
+        uses: David-Coach-Dev/js-action-cf@v1.0
+        with:
+          who-to-greet: "hola de parte Dc DEv"
+
       - name: Update packages
+
         run: |
           echo "Updating packages"
           chmod +x script.sh
@@ -49,5 +55,3 @@ jobs:
           ls -la .
           echo "Files in the parent directory:"
           ls -la ..
-          echo "Installing necessary packages"
-          sudo apt-get install
