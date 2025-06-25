@@ -11,7 +11,7 @@ runs:
   using: "composite"
 
   steps:
-    - name: "Hello World"
+    - name: "Greeting"
       id: "Hola"
       uses: "actions/hello-world-javascript-action@v1"
       with:
@@ -21,3 +21,7 @@ runs:
       run: |
         echo "Greeting: ${{ steps.Hola.outputs.greeting }}"
         echo "Hola Mundo desde Dc Dev Actions"
+
+# Example usage:
+#  - name: saludo
+#    uses: ./.github/actions/dc_dev_actions

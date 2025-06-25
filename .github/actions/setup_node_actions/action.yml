@@ -1,0 +1,35 @@
+name: node setup
+description: "Setup Node.js for actions"
+
+inputs:
+  node-version:
+    description: "Node.js version to use"
+    required: false
+    default: "latest"
+
+runs:
+  using: "composite"
+
+  steps:
+    - name: "Set up Node.js"
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    - name: "Node version"
+      shell: bash
+      run: |
+        echo "Checking Node.js version:"
+        node --version
+
+    - name: "Npm version"
+      shell: bash
+      run: |
+        echo "Checking npm version:"
+        npm --version
+
+# Example usage:
+#  - name: Set up Node.js
+#    uses: ./.github/actions/setup_node_actions
+#    with:
+#      node-version: 'latest'

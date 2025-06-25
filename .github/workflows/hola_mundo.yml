@@ -14,23 +14,5 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4.1.7
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-      - name: node version
-        run: |
-          echo "Checking Node.js version:"
-          node --version
-          echo "Checking npm version:"
-          npm --version
       - name: List all files
-        run: |
-          echo "Listing all files in the repository:"
-          ls -la
-          echo "Current directory:"
-          pwd
-          echo "Files in the current directory:"
-          ls -la .
-          echo "Files in the parent directory:"
-          ls -la ..
+        uses: ./.github/actions/list_file_actions

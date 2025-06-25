@@ -1,0 +1,14 @@
+name: Update Actions
+description: Update actions in the repository
+
+runs:
+  using: "composite"
+
+  steps:
+    - name: Update actions
+      run: |
+          echo "Adding permissions to the script file"
+          chmod +x ./.github/script/update_system/update_system.sh
+          echo "Running the update script"
+          ./.github/script/update_system/update_system.sh
+          echo "Actions updated successfully."
