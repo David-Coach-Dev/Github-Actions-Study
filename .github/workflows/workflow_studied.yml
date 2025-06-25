@@ -2,22 +2,21 @@ name: Workflow Studied
 on: [push]
 jobs:
   saludo:
+    name: Saludo Job
     runs-on: ubuntu-latest
-    services:
-      mysql:
-        image: mysql:latest
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: testdb
-        ports:
-          - 3306:3306
-      redis:
-        image: redis:latest
-        ports:
-          - 6379:6379
+
+    env:
+      NAME_DEV: Dc Dev
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4.1.7
       - name: Saludo
         uses: ./.github/actions/dc_dev_actions
+        with:
+          message: Hola Mundo desde $NAME_DEV Actions
+      - name: bash test
+        shell: bash
+        run: |
+          echo "Hola Mundo desde Dc Dev Actions"
+          echo "Hola Mundo desde $NAME_DEV Actions"
