@@ -6,7 +6,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4.1.7
-      - name: saludo
+      - name: Saludo
         uses: ./.github/actions/dc_dev_actions
   list-all-files:
     runs-on: ubuntu-latest
