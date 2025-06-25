@@ -10,3 +10,8 @@ runs:
       uses: "actions/hello-world-javascript-action@v1"
       with:
         who-to-greet: "de parte de Dc Dev."
+    - name: "Print greeting"
+      shell: bash
+      run: |
+        echo "Greeting: ${{ steps.Hola.outputs.greeting }}"
+        echo "Hola Mundo desde Dc Dev Actions"
