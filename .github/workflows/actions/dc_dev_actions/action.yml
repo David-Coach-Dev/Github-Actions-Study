@@ -1,0 +1,12 @@
+name: "Dc Dev Actions"
+description: "A collection the DC Dev actions"
+
+runs:
+  using: "composite"
+
+  steps:
+    - name: "Hello World"
+      id: "Hola"
+      uses: "actions/hello-world@v1"
+      with:
+        who-to-greet: "de parte de Dc Dev."
