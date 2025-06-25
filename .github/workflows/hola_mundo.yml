@@ -31,6 +31,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4.1.7
+
+      - name: Update packages
+        run: |
+          echo "Updating packages"
+          chmod +x script.sh
+          echo "Running script.sh"
+          ./script.sh
+          echo "Package update completed."
       - name: List all files
         run: |
           echo "Listing all files in the repository:"
@@ -41,3 +49,5 @@ jobs:
           ls -la .
           echo "Files in the parent directory:"
           ls -la ..
+          echo "Installing necessary packages"
+          sudo apt-get install
