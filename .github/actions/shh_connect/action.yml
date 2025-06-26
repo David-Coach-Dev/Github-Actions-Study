@@ -1,0 +1,113 @@
+name: SSH Connect Action
+description: "Connects to SSH server and runs a command"
+inputs:
+  host:
+    description: "SSH host to connect to"
+    required: true
+  user:
+    description: "SSH username"
+    required: true
+  ssh_private_key:
+    description: "SSH private key (should be passed from secrets)"
+    required: true
+  command:
+    description: "Command to run on SSH server"
+    required: true
+    default: "ls -la"
+  port:
+    description: "SSH port"
+    required: false
+    default: "22"
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Setup SSH connection"
+      shell: bash
+      run: |
+        echo "🔧 Setting up SSH connection..."
+
+        # Validate required inputs
+        if [ -z "${{ inputs.host }}" ]; then
+          echo "❌ Error: SSH host is required"
+          exit 1
+        fi
+
+        if [ -z "${{ inputs.user }}" ]; then
+          echo "❌ Error: SSH user is required"
+          exit 1
+        fi
+
+        if [ -z "${{ inputs.ssh_private_key }}" ]; then
+          echo "❌ Error: SSH private key is required"
+          exit 1
+        fi
+
+        # Check if SSH client is available
+        if ! command -v ssh &> /dev/null; then
+          echo "❌ SSH client not found, installing..."
+          sudo apt-get update -y && sudo apt-get upgrade -y && sudo apt-get install -y openssh-client
+        fi
+
+        # Create SSH directory and set up keys
+        mkdir -p ~/.ssh
+        chmod 700 ~/.ssh
+
+        # Write private key
+        echo "${{ inputs.ssh_private_key }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+
+        # Add host to known hosts
+        echo "🔑 Adding ${{ inputs.host }} to known hosts..."
+        ssh-keyscan -p ${{ inputs.port }} -H ${{ inputs.host }} >> ~/.ssh/known_hosts 2>/dev/null || {
+          echo "⚠️  Warning: Could not add host to known hosts, using StrictHostKeyChecking=no"
+          echo "Host ${{ inputs.host }}" >> ~/.ssh/config
+          echo "  StrictHostKeyChecking no" >> ~/.ssh/config
+          echo "  UserKnownHostsFile /dev/null" >> ~/.ssh/config
+          chmod 600 ~/.ssh/config
+        }
+
+        chmod 644 ~/.ssh/known_hosts 2>/dev/null || true
+
+        echo "✅ SSH connection setup complete"
+
+    - name: "Test SSH connection"
+      shell: bash
+      run: |
+        echo "🧪 Testing SSH connection..."
+        if ssh -o ConnectTimeout=10 -p ${{ inputs.port }} ${{ inputs.user }}@${{ inputs.host }} "echo 'Connection successful'" 2>/dev/null; then
+          echo "✅ SSH connection test passed"
+        else
+          echo "❌ SSH connection test failed"
+          echo "Please verify:"
+          echo "  - Host: ${{ inputs.host }}"
+          echo "  - User: ${{ inputs.user }}"
+          echo "  - Port: ${{ inputs.port }}"
+          echo "  - Private key is correct"
+          exit 1
+        fi
+
+    - name: "Execute command on SSH server"
+      shell: bash
+      run: |
+        echo "🚀 Executing command: ${{ inputs.command }}"
+        echo "📡 Connecting to: ${{ inputs.user }}@${{ inputs.host }}:${{ inputs.port }}"
+
+        # Execute command and capture output
+        if ssh -p ${{ inputs.port }} ${{ inputs.user }}@${{ inputs.host }} "${{ inputs.command }}"; then
+          echo "✅ Command executed successfully"
+        else
+          echo "❌ Command execution failed"
+          exit 1
+        fi
+
+    - name: "Cleanup SSH keys"
+      shell: bash
+      if: always()
+      run: |
+        echo "🧹 Cleaning up SSH keys and config..."
+        rm -f ~/.ssh/id_rsa
+        rm -f ~/.ssh/config
+        # Keep known_hosts for future use, just remove our entry
+        sed -i "/${{ inputs.host }}/d" ~/.ssh/known_hosts 2>/dev/null || true
+        echo "✅ Cleanup complete"

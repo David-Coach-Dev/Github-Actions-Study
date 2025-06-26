@@ -1,0 +1,172 @@
+name: Slack Webhook Notification
+description: "Send messages to Slack using webhooks with rich formatting and error handling"
+
+inputs:
+  webhook_url:
+    description: "Slack webhook URL (should be passed from secrets)"
+    required: true
+  message:
+    description: "Message to display"
+    required: false
+    default: "Notification from GitHub Actions"
+  title:
+    description: "Title of the Slack message"
+    required: false
+    default: "GitHub Actions Notification"
+  channel:
+    description: "Slack channel to send the message to (optional, webhook default will be used if not specified)"
+    required: false
+    default: "not-gh-act"
+  username:
+    description: "Username to display in Slack"
+    required: false
+    default: "GitHub Actions Bot"
+  icon_emoji:
+    description: "Emoji icon to use in Slack"
+    required: false
+    default: ":rocket:"
+  color:
+    description: "Color for the message attachment (good, warning, danger, or hex color)"
+    required: false
+    default: "good"
+  status:
+    description: "Status of the build (success, failure, warning, info)"
+    required: false
+    default: "info"
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Validate webhook URL"
+      shell: bash
+      run: |
+        echo "🔍 Validating Slack webhook configuration..."
+
+        if [ -z "${{ inputs.webhook_url }}" ]; then
+          echo "❌ Error: webhook_url is required"
+          exit 1
+        fi
+
+        if [[ ! "${{ inputs.webhook_url }}" =~ ^https://hooks.slack.com/services/ ]]; then
+          echo "❌ Error: Invalid Slack webhook URL format"
+          echo "Expected format: https://hooks.slack.com/services/..."
+          exit 1
+        fi
+
+        echo "✅ Webhook URL validation passed"
+
+    - name: "Prepare Slack message"
+      shell: bash
+      run: |
+        echo "📝 Preparing Slack message..."
+
+        # Set color based on status
+        case "${{ inputs.status }}" in
+          "success") COLOR="good" ;;
+          "failure") COLOR="danger" ;;
+          "warning") COLOR="warning" ;;
+          *) COLOR="${{ inputs.color }}" ;;
+        esac
+
+        # Set emoji based on status
+        case "${{ inputs.status }}" in
+          "success") EMOJI="✅" ;;
+          "failure") EMOJI="❌" ;;
+          "warning") EMOJI="⚠️" ;;
+          *) EMOJI="ℹ️" ;;
+        esac
+
+        # Build JSON payload
+        PAYLOAD=$(cat <<EOF
+        {
+          "username": "${{ inputs.username }}",
+          "icon_emoji": "${{ inputs.icon_emoji }}",
+          "attachments": [
+            {
+              "color": "${COLOR}",
+              "title": "${EMOJI} ${{ inputs.title }}",
+              "text": "${{ inputs.message }}",
+              "fields": [
+                {
+                  "title": "Repository",
+                  "value": "${{ github.repository }}",
+                  "short": true
+                },
+                {
+                  "title": "Branch",
+                  "value": "${{ github.ref_name }}",
+                  "short": true
+                },
+                {
+                  "title": "Event",
+                  "value": "${{ github.event_name }}",
+                  "short": true
+                },
+                {
+                  "title": "Actor",
+                  "value": "${{ github.actor }}",
+                  "short": true
+                },
+                {
+                  "title": "Workflow",
+                  "value": "${{ github.workflow }}",
+                  "short": true
+                },
+                {
+                  "title": "Run ID",
+                  "value": "<https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|#${{ github.run_number }}>",
+                  "short": true
+                }
+              ],
+              "footer": "GitHub Actions",
+              "footer_icon": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
+              "ts": $(date +%s)
+            }
+          ]
+        }
+        EOF
+        )
+
+        # Add channel if specified
+        if [ -n "${{ inputs.channel }}" ]; then
+          PAYLOAD=$(echo "$PAYLOAD" | jq '. + {"channel": "${{ inputs.channel }}"}')
+        fi
+
+        # Save payload to file
+        echo "$PAYLOAD" > /tmp/slack_payload.json
+        echo "✅ Message prepared successfully"
+
+    - name: "Send Slack notification"
+      shell: bash
+      run: |
+        echo "🚀 Sending message to Slack..."
+
+        # Send the webhook
+        HTTP_CODE=$(curl -s -w "%{http_code}" -o /tmp/slack_response.json \
+          -X POST \
+          -H "Content-Type: application/json" \
+          -d @/tmp/slack_payload.json \
+          "${{ inputs.webhook_url }}")
+
+        echo "HTTP Status Code: $HTTP_CODE"
+
+        # Check response
+        if [ "$HTTP_CODE" -eq 200 ]; then
+          echo "✅ Message sent successfully to Slack"
+          if [ "${{ inputs.channel }}" ]; then
+            echo "📍 Channel: ${{ inputs.channel }}"
+          fi
+        else
+          echo "❌ Failed to send message to Slack"
+          echo "Response:"
+          cat /tmp/slack_response.json
+          exit 1
+        fi
+
+    - name: "Cleanup temporary files"
+      shell: bash
+      if: always()
+      run: |
+        echo "🧹 Cleaning up temporary files..."
+        rm -f /tmp/slack_payload.json /tmp/slack_response.json
+        echo "✅ Cleanup complete"
