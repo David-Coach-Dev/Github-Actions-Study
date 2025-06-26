@@ -5,6 +5,7 @@ inputs:
   webhook_url:
     description: "Slack webhook URL (should be passed from secrets)"
     required: true
+    default: "https://hooks.slack.com/services/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"
   message:
     description: "Message to display"
     required: false
