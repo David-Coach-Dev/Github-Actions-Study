@@ -2,11 +2,8 @@ name: Workflow Studied
 on: [push]
 jobs:
   saludo:
-    name: Saludo ${{ secrets.NAME_DEV }}
+    name: Saludo job
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      issues: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4.1.7
