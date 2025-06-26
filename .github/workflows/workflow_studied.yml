@@ -4,24 +4,25 @@ jobs:
   saludo:
     name: Saludo job
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    env:
+      ENV_NAME_DEV: "Dc Dev Studio"
+      NAME_DEV: ${{ vars.DEV_NAME }}
+      REPO_NAME: ${{ github.repository }}
+      SECRET_DEV_NAME: ${{ secrets.NAME_DEV }}
+      ACTOR: ${{ github.actor }}
+      EVENT_NAME: ${{ github.event_name }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4.1.7
-
       - name: Saludo
         uses: ./.github/actions/dc_dev_actions
         with:
-          message: "Hola Mundo desde ${{ secrets.NAME_DEV }} Actions"
-
+          message: "Hola Mundo desde $NAME_DEV en el repositorio $REPO_NAME"
       - name: bash test
         shell: bash
-        env:
-          ENV_NAME_DEV: "Dc Dev Studio"
-          NAME_DEV: ${{ vars.DEV_NAME }}
-          REPO_NAME: ${{ github.repository }}
-          SECRET_DEV_NAME: ${{ secrets.NAME_DEV }}
-          ACTOR: ${{ github.actor }}
-          EVENT_NAME: ${{ github.event_name }}
         run: |
           echo "env interna: $ENV_NAME_DEV"
           echo "env vars github: $NAME_DEV"
