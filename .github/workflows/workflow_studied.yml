@@ -7,10 +7,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4.1.7
+
       - name: Saludo
         uses: ./.github/actions/dc_dev_actions
         with:
           message: "Hola Mundo desde ${{ secrets.NAME_DEV }} Actions"
+
       - name: bash test
         shell: bash
         env:
@@ -18,10 +20,12 @@ jobs:
           NAME_DEV: ${{ vars.DEV_NAME }}
           REPO_NAME: ${{ github.repository }}
           SECRET_DEV_NAME: ${{ secrets.NAME_DEV }}
+          ACTOR: ${{ github.actor }}
+          EVENT_NAME: ${{ github.event_name }}
         run: |
           echo "env interna: $ENV_NAME_DEV"
           echo "env vars github: $NAME_DEV"
           echo "env var secret github: $SECRET_DEV_NAME"
           echo "Repository: $REPO_NAME"
-          echo "Actor: ${{ github.actor }}"
-          echo "Event: ${{ github.event_name }}"
+          echo "Actor: $ACTOR"
+          echo "Event: $EVENT_NAME"
