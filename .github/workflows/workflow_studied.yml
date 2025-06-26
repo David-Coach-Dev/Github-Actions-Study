@@ -14,14 +14,14 @@ jobs:
       - name: bash test
         shell: bash
         env:
-          ENV_NAME_DEV: "Dc Dev"
+          ENV_NAME_DEV: "Dc Dev Studio"
           NAME_DEV: ${{ vars.DEV_NAME }}
           REPO_NAME: ${{ github.repository }}
           SECRET_DEV_NAME: ${{ secrets.NAME_DEV }}
         run: |
-          echo "Hola Mundo desde $ENV_NAME_DEV"
-          echo "Hola Mundo desde $NAME_DEV"
-          echo "Hola Mundo desde $SECRET_DEV_NAME (secreto)"
+          echo "env interna: $ENV_NAME_DEV"
+          echo "env vars github: $NAME_DEV"
+          echo "env var secret github: $SECRET_DEV_NAME"
           echo "Repository: $REPO_NAME"
           echo "Actor: ${{ github.actor }}"
           echo "Event: ${{ github.event_name }}"
