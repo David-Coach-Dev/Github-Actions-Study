@@ -139,11 +139,16 @@ runs:
       run: |
         echo "🚀 Sending message to Slack..."
 
-        # Method 1: Using JSON payload (current approach)
+        # Build the payload string exactly like the working example
+        PAYLOAD_STRING=$(cat /tmp/slack_payload.json | tr -d '\n' | tr -d ' ')
+
+        echo "📋 Payload being sent:"
+        echo "$PAYLOAD_STRING"
+
+        # Method: Using --data-urlencode "payload=..." (matching your working example)
         HTTP_CODE=$(curl -s -w "%{http_code}" -o /tmp/slack_response.json \
           -X POST \
-          -H "Content-Type: application/json" \
-          -d @/tmp/slack_payload.json \
+          --data-urlencode "payload=$PAYLOAD_STRING" \
           "${{ inputs.webhook_url }}")
 
         echo "HTTP Status Code: $HTTP_CODE"
@@ -163,8 +168,24 @@ runs:
           echo ""
           echo "🔍 Debugging info:"
           echo "URL: ${{ inputs.webhook_url }}"
-          echo "Payload size: $(wc -c < /tmp/slack_payload.json) bytes"
-          exit 1
+          echo "Payload size: $(echo "$PAYLOAD_STRING" | wc -c) bytes"
+
+          # Try alternative method if first fails
+          echo "🔄 Trying alternative method..."
+          HTTP_CODE_ALT=$(curl -s -w "%{http_code}" -o /tmp/slack_response_alt.json \
+            -X POST \
+            -H "Content-Type: application/json" \
+            -d @/tmp/slack_payload.json \
+            "${{ inputs.webhook_url }}")
+
+          echo "Alternative HTTP Status Code: $HTTP_CODE_ALT"
+          if [ "$HTTP_CODE_ALT" -eq 200 ]; then
+            echo "✅ Alternative method succeeded"
+          else
+            echo "❌ Both methods failed"
+            cat /tmp/slack_response_alt.json
+            exit 1
+          fi
         fi
 
     - name: "Cleanup temporary files"
