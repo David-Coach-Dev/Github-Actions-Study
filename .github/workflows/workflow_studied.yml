@@ -15,7 +15,7 @@ jobs:
         shell: bash
         env:
           ENV_NAME_DEV: "Dc Dev"
-          NAME_DEV: ${{ vars.DEV_NAME}}
+          NAME_DEV: ${{ vars.DEV_NAME }}
           REPO_NAME: ${{ github.repository }}
           SECRET_DEV_NAME: ${{ secrets.NAME_DEV }}
         run: |
