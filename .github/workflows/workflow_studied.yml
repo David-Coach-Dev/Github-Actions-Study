@@ -10,9 +10,15 @@ jobs:
       - name: Saludo
         uses: ./.github/actions/dc_dev_actions
         with:
-          message: Hola Mundo desde ${{ vars.DEV_NAME }} Actions
+          message: "Hola Mundo desde ${{ github.actor }} Actions"
       - name: bash test
         shell: bash
+        env:
+          NAME_DEV: "DcDev"
+          REPO_NAME: ${{ github.repository }}
         run: |
           echo "Hola Mundo desde Dc Dev Actions"
           echo "Hola Mundo desde $NAME_DEV Actions"
+          echo "Repository: $REPO_NAME"
+          echo "Actor: ${{ github.actor }}"
+          echo "Event: ${{ github.event_name }}"
