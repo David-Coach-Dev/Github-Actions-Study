@@ -8,6 +8,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      SLACK_WEBHOOKS: ${{ secrets.SLACK_WEBHOOKS }}
 
     steps:
       - uses: actions/checkout@v4
@@ -19,7 +21,7 @@ jobs:
         if: success()
         uses: ./.github/actions/slack_webhooks
         with:
-          webhook_url: ${{ secrets.SLACK_WEBHOOKS }}
+          webhook_url: ${{ env.SLACK_WEBHOOKS }}
           title: "Tests Passed ✅"
           message: "All tests are passing on branch ${{ github.ref_name }}"
           status: "success"
