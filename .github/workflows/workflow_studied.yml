@@ -2,7 +2,7 @@ name: Workflow Studied
 on: [push]
 jobs:
   saludo:
-    name: Saludo ${{ secrets.NAME_dev }}
+    name: Saludo ${{ secrets.NAME_DEV }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
