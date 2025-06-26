@@ -2,19 +2,18 @@ name: Workflow Studied
 on: [push]
 jobs:
   saludo:
-    name: Saludo Job
+    name: Saludo ${{ secrets.NAME_dev }}
     runs-on: ubuntu-latest
-
-    env:
-      NAME_DEV: Dc Dev
-
+    permissions:
+      contents: read
+      issues: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4.1.7
       - name: Saludo
         uses: ./.github/actions/dc_dev_actions
         with:
-          message: Hola Mundo desde $NAME_DEV Actions
+          message: Hola Mundo desde ${{ vars.DEV_NAME }} Actions
       - name: bash test
         shell: bash
         run: |

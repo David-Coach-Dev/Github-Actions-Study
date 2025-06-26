@@ -58,3 +58,22 @@ oracle:
     ports:
       - 1521:1521
 ```
+
+## Environment variable example
+
+```yaml
+ env:
+      NAME_DEV: Dc Dev
+```
+
+## Environment variable for the Github environment
+
+```yml
+  ${{ vars.DEV_NAME }}
+```
+
+## Environment variable for the Github environment secret
+
+```yml
+  ${{ secrets.NAME_DEV }}
+```
