@@ -4,8 +4,7 @@ description: "Send messages to Slack using webhooks with rich formatting and err
 inputs:
   webhook_url:
     description: "Slack webhook URL (should be passed from secrets)"
-    required: false
-    default: "${{ secrets.SLACK_WEBHOOKS }}"
+    required: true
   message:
     description: "Message to display"
     required: false
