@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       slack_wh: ${{ secrets.SLACK_WEBHOOKS }}
+      slack_token: ${{ secrets.SLACK_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
@@ -21,10 +22,13 @@ jobs:
         if: success()
         uses: ./.github/actions/slack_webhooks
         with:
-          # webhook_url: ${{ env.slack_wh }}
+          webhook_url: ${{ env.slack_wh }}
+          token: ${{ env.slack_token }}
+          username: "CI Bot"
           title: "Tests Passed ✅"
           message: "All tests are passing on branch ${{ github.ref_name }}"
           status: "success"
+          icon_emoji: ":white_check_mark:"
 
       - name: Test Failure Notification
         if: failure()

@@ -4,8 +4,7 @@ description: "Send messages to Slack using webhooks with rich formatting and err
 inputs:
   webhook_url:
     description: "Slack webhook URL (should be passed from secrets)"
-    required: false
-    default: "https://hooks.slack.com/services/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"
+    required: true
   message:
     description: "Message to display"
     required: false
@@ -77,9 +76,10 @@ runs:
           *) EMOJI="ℹ️" ;;
         esac
 
-        # Build JSON payload
+        # Build JSON payload (matching Slack webhook format)
         PAYLOAD=$(cat <<EOF
         {
+          "channel": "${{ inputs.channel }}",
           "username": "${{ inputs.username }}",
           "icon_emoji": "${{ inputs.icon_emoji }}",
           "attachments": [
@@ -128,21 +128,18 @@ runs:
         EOF
         )
 
-        # Add channel if specified
-        if [ -n "${{ inputs.channel }}" ]; then
-          PAYLOAD=$(echo "$PAYLOAD" | jq '. + {"channel": "${{ inputs.channel }}"}')
-        fi
-
         # Save payload to file
         echo "$PAYLOAD" > /tmp/slack_payload.json
         echo "✅ Message prepared successfully"
+        echo "📋 Payload preview:"
+        echo "$PAYLOAD" | head -10
 
     - name: "Send Slack notification"
       shell: bash
       run: |
         echo "🚀 Sending message to Slack..."
 
-        # Send the webhook
+        # Method 1: Using JSON payload (current approach)
         HTTP_CODE=$(curl -s -w "%{http_code}" -o /tmp/slack_response.json \
           -X POST \
           -H "Content-Type: application/json" \
@@ -154,13 +151,19 @@ runs:
         # Check response
         if [ "$HTTP_CODE" -eq 200 ]; then
           echo "✅ Message sent successfully to Slack"
-          if [ "${{ inputs.channel }}" ]; then
+          if [ -n "${{ inputs.channel }}" ]; then
             echo "📍 Channel: ${{ inputs.channel }}"
           fi
+          echo "👤 Username: ${{ inputs.username }}"
+          echo "📝 Message: ${{ inputs.message }}"
         else
           echo "❌ Failed to send message to Slack"
-          echo "Response:"
+          echo "📋 Response details:"
           cat /tmp/slack_response.json
+          echo ""
+          echo "🔍 Debugging info:"
+          echo "URL: ${{ inputs.webhook_url }}"
+          echo "Payload size: $(wc -c < /tmp/slack_payload.json) bytes"
           exit 1
         fi
 

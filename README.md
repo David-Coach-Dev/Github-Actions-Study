@@ -460,10 +460,3 @@ En tu acción SSH, if: always() es perfecto porque:
 ---
 
 ## ¡Es una muy buena práctica de seguridad! 🚀
-
-
-### pilas
-
-SLACK_WEBHOOKS
-
-https://hooks.slack.com/services/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
