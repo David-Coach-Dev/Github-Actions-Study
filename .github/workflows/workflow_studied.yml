@@ -21,7 +21,7 @@ jobs:
         if: success()
         uses: ./.github/actions/slack_webhooks
         with:
-          webhook_url: ${{ env.SLACK_WEBHOOKS }}
+          webhook_url: $env.SLACK_WEBHOOKs
           title: "Tests Passed ✅"
           message: "All tests are passing on branch ${{ github.ref_name }}"
           status: "success"
