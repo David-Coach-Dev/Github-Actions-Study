@@ -50,7 +50,7 @@ jobs:
         if: success()
         uses: ./.github/actions/slack_webhooks
         with:
-          #webhook_url: ${{ secrets.SLACK_WEBHOOKS }}
+          webhook_url: ${{ secrets.SLACK_WEBHOOKS }}
           title: "🚀 Production Deploy Successful"
           message: |
             Production deployment completed!
