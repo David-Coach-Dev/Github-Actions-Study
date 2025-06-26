@@ -60,6 +60,12 @@ runs:
       run: |
         echo "📝 Preparing Slack message..."
 
+        # Check if jq is available, install if not
+        if ! command -v jq &> /dev/null; then
+          echo "📦 Installing jq..."
+          sudo apt-get update -q && sudo apt-get install -y jq
+        fi
+
         # Set color based on status
         case "${{ inputs.status }}" in
           "success") COLOR="good" ;;
@@ -76,7 +82,7 @@ runs:
           *) EMOJI="ℹ️" ;;
         esac
 
-        # Build JSON payload (matching Slack webhook format)
+        # Build JSON payload (matching official Slack webhook format)
         PAYLOAD=$(cat <<EOF
         {
           "channel": "${{ inputs.channel }}",
@@ -84,18 +90,24 @@ runs:
           "icon_emoji": "${{ inputs.icon_emoji }}",
           "attachments": [
             {
+              "fallback": "${{ inputs.title }}: ${{ inputs.message }}",
               "color": "${COLOR}",
-              "title": "${EMOJI} ${{ inputs.title }}",
+              "pretext": "${EMOJI} GitHub Actions Notification",
+              "author_name": "${{ github.actor }}",
+              "author_link": "https://github.com/${{ github.actor }}",
+              "author_icon": "https://github.com/${{ github.actor }}.png?size=32",
+              "title": "${{ inputs.title }}",
+              "title_link": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}",
               "text": "${{ inputs.message }}",
               "fields": [
                 {
                   "title": "Repository",
-                  "value": "${{ github.repository }}",
+                  "value": "<https://github.com/${{ github.repository }}|${{ github.repository }}>",
                   "short": true
                 },
                 {
                   "title": "Branch",
-                  "value": "${{ github.ref_name }}",
+                  "value": "\`${{ github.ref_name }}\`",
                   "short": true
                 },
                 {
@@ -104,8 +116,8 @@ runs:
                   "short": true
                 },
                 {
-                  "title": "Actor",
-                  "value": "${{ github.actor }}",
+                  "title": "Status",
+                  "value": "${{ inputs.status }}",
                   "short": true
                 },
                 {
@@ -114,8 +126,8 @@ runs:
                   "short": true
                 },
                 {
-                  "title": "Run ID",
-                  "value": "<https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|#${{ github.run_number }}>",
+                  "title": "Run Number",
+                  "value": "#${{ github.run_number }}",
                   "short": true
                 }
               ],
@@ -137,13 +149,11 @@ runs:
     - name: "Send Slack notification"
       shell: bash
       run: |
-        echo "🚀 Sending message to Slack..."
+        echo "🚀 Sending message to Slack..."        # Build the payload string with proper JSON formatting
+        PAYLOAD_STRING=$(cat /tmp/slack_payload.json | jq -c .)
 
-        # Build the payload string exactly like the working example
-        PAYLOAD_STRING=$(cat /tmp/slack_payload.json | tr -d '\n' | tr -d ' ')
-
-        echo "📋 Payload being sent:"
-        echo "$PAYLOAD_STRING"
+        echo "📋 Payload being sent (formatted):"
+        echo "$PAYLOAD_STRING" | jq .
 
         # Method: Using --data-urlencode "payload=..." (matching your working example)
         HTTP_CODE=$(curl -s -w "%{http_code}" -o /tmp/slack_response.json \
