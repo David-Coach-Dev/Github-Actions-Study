@@ -21,7 +21,7 @@ jobs:
         if: success()
         uses: ./.github/actions/slack_webhooks
         with:
-          webhook_url: $env.SLACK_WEBHOOKs
+          webhook_url: ${{ env.SLACK_WEBHOOKS }}
           title: "Tests Passed ✅"
           message: "All tests are passing on branch ${{ github.ref_name }}"
           status: "success"
@@ -30,7 +30,7 @@ jobs:
         if: failure()
         uses: ./.github/actions/slack_webhooks
         with:
-          webhook_url: ${{ secrets.SLACK_WEBHOOKS }}
+          webhook_url: ${{ env.SLACK_WEBHOOKS }}
           title: "Tests Failed ❌"
           message: "Tests are failing on branch ${{ github.ref_name }}. Please check the logs."
           status: "failure"
@@ -49,7 +49,7 @@ jobs:
         if: success()
         uses: ./.github/actions/slack_webhooks
         with:
-          webhook_url: ${{ secrets.SLACK_WEBHOOKS }}
+          webhook_url: ${{ env.SLACK_WEBHOOKS }}
           title: "🚀 Production Deploy Successful"
           message: |
             Production deployment completed!
@@ -63,7 +63,7 @@ jobs:
         if: failure()
         uses: ./.github/actions/slack_webhooks
         with:
-          webhook_url: ${{ secrets.SLACK_WEBHOOKS }}
+          webhook_url: ${{ env.SLACK_WEBHOOKS }}
           title: "🚨 Production Deploy Failed"
           message: "Production deployment failed! Immediate attention required."
           status: "failure"
