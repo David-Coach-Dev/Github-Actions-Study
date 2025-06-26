@@ -14,12 +14,13 @@ jobs:
       - name: bash test
         shell: bash
         env:
-          NAME_DEV: "DcDev"
+          ENV_NAME_DEV: "Dc Dev"
+          NAME_DEV: ${{ vars.DEV_NAME}}
           REPO_NAME: ${{ github.repository }}
           SECRET_DEV_NAME: ${{ secrets.NAME_DEV }}
         run: |
-          echo "Hola Mundo desde Dc Dev Actions"
-          echo "Hola Mundo desde $NAME_DEV Actions"
+          echo "Hola Mundo desde $ENV_NAME_DEV"
+          echo "Hola Mundo desde $NAME_DEV"
           echo "Hola Mundo desde $SECRET_DEV_NAME (secreto)"
           echo "Repository: $REPO_NAME"
           echo "Actor: ${{ github.actor }}"
