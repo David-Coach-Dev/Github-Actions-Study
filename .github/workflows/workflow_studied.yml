@@ -4,13 +4,12 @@ on:
     branches: [main, develop]
   pull_request:
     branches: [main]
-
+env:
+  SLACK_WEBHOOKS: ${{ secrets.SLACK_WEBHOOKS }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      SLACK_WEBHOOKS: ${{ secrets.SLACK_WEBHOOKS }}
-
     steps:
       - uses: actions/checkout@v4
 
@@ -21,7 +20,7 @@ jobs:
         if: success()
         uses: ./.github/actions/slack_webhooks
         with:
-          webhook_url: ${{ env.SLACK_WEBHOOKS }}
+          webhook_url: $SLACK_WEBHOOKS
           title: "Tests Passed ✅"
           message: "All tests are passing on branch ${{ github.ref_name }}"
           status: "success"
@@ -55,7 +54,6 @@ jobs:
           title: "🚀 Production Deploy Successful"
           message: |
             Production deployment completed!
-
             **Commit:** ${{ github.event.head_commit.message }}
             **Author:** ${{ github.event.head_commit.author.name }}
           status: "success"
