@@ -38,6 +38,8 @@ jobs:
   deploy:
     needs: test
     runs-on: ubuntu-latest
+    env:
+      SLACK_WEBHOOKS: ${{ secrets.SLACK_WEBHOOKS }}
     if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
